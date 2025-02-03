@@ -1,0 +1,390 @@
+\documentclass{beamer}
+\usetheme{CambridgeUS} % replace it with Boadilla if you want no section bar
+%\usecolortheme{crane} % other ones: dove, dolphin, rose, seahorse, orchid, crane, seagull, lily, wolverine
+%\usefonttheme{serif} 
+\usefonttheme[onlymath]{serif} % uncomment if you want it just for math
+
+\setbeamertemplate{navigation symbols}{}  % comment to have nagivation
+
+\usepackage[compress,comma,authoryear]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{mindmap,trees}
+\usepackage{amsmath,mathtools}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx,epstopdf}
+\usepackage{hyperref}
+
+
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{orange}{RGB}{213,94,0}
+\definecolor{red}{RGB}{190,0,0}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{green}{RGB}{0,158,115}
+\definecolor{Lblue}{RGB}{0,197,155}
+\definecolor{Dblue}{RGB}{0,76,119}
+\definecolor{Lgreen}{RGB}{180,255,230}
+
+\hypersetup{
+	colorlinks=false,
+	linkbordercolor = {white},
+	linkcolor = {blue}
+}
+\definecolor{MyBackground}{RGB}{245,245,245}
+
+\setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{title}{fg=blue}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{itemize item}[circle]%{$\bigstar$}
+\setbeamertemplate{itemize subitem}{$\bigstar$}
+\setbeamercolor{itemize item}{fg=blue}
+\setbeamercolor{itemize subitem}{fg=blue}
+\setbeamercolor{enumerate item}{fg=blue}
+\setbeamercolor{enumerate subitem}{fg=blue}
+\setbeamercolor{button}{bg=MyBackground,fg=blue}
+\setbeamercolor*{palette primary}{use=structure,fg=blue,bg=white}
+\setbeamercolor*{palette secondary}{use=structure,fg=white,bg=Dblue}
+\setbeamercolor*{palette tertiary}{use=structure,fg=white,bg=blue}
+\setbeamercolor*{palette quaternary}{fg=white,bg=black}
+\setbeamercolor*{palettes quaternary}{fg=white,bg=Lgreen}
+%\setbeamercolor{titlelike}{parent=structure,bg=Lgreen}
+%\setbeamercolor{title in head/foot}{bg=Lgreen,fg=orange}
+
+\setbeamertemplate{enumerate item}{%
+	\usebeamercolor[bg]{item projected}%
+	\raisebox{1.5pt}{\colorbox{blue}{\color{fg}\footnotesize\insertenumlabel}}%
+}
+
+
+
+
+
+\begin{document}
+	\title[Econometrics 2]{Econometrics 2 (M.Sc.)}
+	\subtitle{Panel Data}
+	\author[Mohammad Hoseini]{Mohammad Hoseini}
+	
+	%\institute[IMPS]{Institute for Management and Planning Studies (IMPS)}
+	
+	\date[Spring 2024]{Spring 2024 \\
+	\vspace{10pt} @metrics2
+}
+	
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+\section{Panel Data}
+\subsection{Introduction}
+
+\begin{frame}{Outline}
+
+\begin{enumerate}
+	\item Introduction
+	\item Random effect models
+	\item Fixed effect models
+	\item Practical issues and some applications.
+\end{enumerate}\bigskip
+
+
+\end{frame}
+
+\begin{frame}{Panel data}
+
+Panal data include observations from 2 dimensions (or more):
+\begin{itemize}
+\item $i$: cross-sectional units like individuals, firms, countries, etc.
+\item $t$: time periods like years, quarters, months, etc.
+\end{itemize}\medskip
+
+Note that repeated cross-section is not panel data.\bigskip
+
+Micro vs. macro panels
+\begin{itemize}
+\item In micro panels $i>>t$ (e.g. lots of firms over few time periods).
+\item In macro panels $i<t$ like (e.g. few countries over 40 years).
+\end{itemize}
+In this course we cover methods useful for micro panels. Macro panel methods are closer to the time series econometrics. 
+\end{frame}
+
+\begin{frame}{Balanced and unbalanced panels}
+Panel data can be balanced or unbalanced:
+\begin{itemize}
+\item Balanced: all units have data for all available time periods.
+\item Unbalanced: units are observed for different amounts of time.
+\end{itemize}\medskip
+
+If the panel is unbalanced for reasons that are not entirely random (e.g. because firms with relatively low levels of productivity have relatively high exit rates), then we may
+need to take this into account when estimating the model.\bigskip
+
+This can be done by means of a sample selection model that we do not cover in this course.
+
+\end{frame}
+
+\begin{frame}{What can panel data solve?}
+Panel data can solve selection-on-unobservables and omitted variable problem when the unobservable factor is {\color{red}\textbf{time-invariant}}.\bigskip
+
+With Panel data we can estimate dynamic equations (e.g. specifications with lagged dependent
+variables on the right-hand side).\bigskip
+
+Panel data methods are often used in combination with other techniques such as IV or Differences-in-Differences.
+\end{frame}
+
+
+\begin{frame}{Omitted variable problem and panel data}
+Suppose the model is  $\ y_{it} = \beta x_{it} + \eta_{it}$
+where $\eta_{it}= a_i+u_{it}$\medskip
+
+Here, $a_i$ is unobserved and our goal is to estimate $\beta$.\medskip
+
+Note that $a_i$ is constant over time for each unit and hence it has no $t$ subscript.\medskip\pause
+
+If we estimate the model with OLS, $a_i$ will be hidden in $\eta_i$.\medskip
+
+The consequence of the unobservable factor $a_i$ can be discussed in two cases:
+\begin{itemize}
+\item $a_i$ and $x_i$ are uncorrelated \onslide<3->{ $\rightarrow$ no OVB: Random Effect models.}
+\item $a_i$ and $x_i$ are correlated \onslide<3->{ $\rightarrow$ OVB: Fixed Effect models.}
+\end{itemize} \medskip
+\onslide<3->{In RE model, we assume $a_i \sim(a,\sigma^2_a)$ is a random variable. \\
+	In FE model, we assume $a_i$ is fixed for each individual $i$.}
+%when we have alpha the mean a_i is zero.
+\end{frame}
+
+\subsection{Random effect models}
+\begin{frame}{Case 1: Corr($a_i$,$x_i)=0$}
+If $a_i$ is uncorrelated with $x_{it}$, we don't have omitted variable problem and $a_i$ is just another unobserved factor making up the residual.\bigskip
+
+But, notice that here we have $E[\eta_{it}\eta_{it-s}]\neq 0$. This means we have serial correlation in error terms.
+\[E[\eta_{it}\eta_{it-s}]=E[(a_i+u_{it})(a_i+u_{it-s})]=E[a_i^2]=\sigma^2_a \]
+\[E[\eta_{it} \eta_{it}']=\Omega=\footnotesize \left[\begin{matrix}
+\sigma^2_{a}+\sigma^2_u & \dots & \sigma^2_{a}&\dots&0& \dots & 0\\
+\vdots & \ddots & \vdots&\vdots & \vdots & \ddots&\vdots\\
+\sigma^2_{a} & \dots & \sigma^2_{a}+\sigma^2_u&\dots&0&\dots&0\\
+\vdots&\vdots&\vdots&\vdots&\vdots&\ddots&\vdots\\
+0&\dots&0& \dots & \sigma^2_{a}+\sigma^2_u & \dots & \sigma^2_{a}\\
+\vdots & \ddots & \vdots&\vdots & \vdots & \ddots&\vdots\\
+0&\dots&0&\dots&\sigma^2_{a} & \dots & \sigma^2_{a}+\sigma^2_u\\
+\end{matrix} \right] \]
+\end{frame}
+
+\begin{frame}{Pooled OLS and Random effect model}
+
+\textbf{Pooled OLS} (\textbf{POLS}) estimator: Simply regress $y$ on $x$ irrespective of panel dimensions. To remove serial correlation, cluster error term at units.
+
+\texttt{. tsset i t \\ . reg y x , cluster(i)}\bigskip
+
+Using POLS with clustering solves for error term correlation, but it doesn't change the coefficient from simple POLS (recall SE issues).\medskip
+
+\textbf{Random Effect (RE)} estimator: GLS estimation with above covariance matrix. It is more efficient than POLS. \medskip
+
+{Feasible GLS (FGLS)}: Since we don't know $\Omega$, in practice FGLS estimates the $\hat{\Omega}$ at step 1 and uses it to find $\beta$ at step 2.
+
+\texttt{. xtreg y x, i(i)}
+\end{frame}
+
+
+
+\subsection{Fixed effect models}
+\begin{frame}{Case 2: Corr($a_i$,$x_i)\neq 0$}
+If $a_i$ is correlated with $x_{it}$, we have omitted variable problem.\bigskip
+
+What could we do about the omitted variable problem in cross-sectional data?\pause
+\begin{itemize}
+\item Find a proxy variable
+\item Find a valid IV that is correlated with the elements of $X_{it}$ and uncorrelated with $a_i$.
+\item Do a randomized experiment.
+\end{itemize}\medskip
+
+Panel data gives additional possibilities to deal with the omitted variables problem.
+\begin{itemize}
+\item We can eliminate $a_i$ using Fixed Effect models.
+%\item Under relatively strong assumptions we can use Random Effect models. 
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Fixed Effect (FE) model}
+\vspace{-10pt}
+\[y_{it} = \beta x_{it}+(a_i+u_{it}), \ \ t = 1,2,\dots,T \ , \  i = 1,2,\dots, N \]
+Assumptions about unobserved terms:
+\begin{itemize}
+\item strict exogeneity: $E(x_{it}u_{is}) = 0$ for $s = 1,2,\dots,T$ 
+\end{itemize}\medskip
+
+Strict exogeneity rules out feedback from past $u_{is}$ shocks to current $x_{it}$.\medskip
+
+One implication of this is that FE will not yield consistent estimates if $x_{it}$ contains lagged dependent variables ($y_{it-1}, y_{it-2} , \dots$).\bigskip
+
+If the assumption of strict exogeneity does not hold, use lag of variables as instruments to get consistent estimates.  Arellano-Bond estimator does this but we do not cover it.
+\end{frame}
+
+\begin{frame}{Estimating Fixed Effect models}
+In FE models there are 3 ways to eliminate $a_i$ that causes the error term to be uncorrelated with the regressors:
+\begin{itemize}
+\item Directly estimate FE model with dummy variables.
+\item Within-transformation (within estimator).
+\item First differencing estimator
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Dummy Variable Estimator}
+The direct way of estimating FE models is to estimate the $a_i$ using a set of dummies for all $i$ in the sample.\bigskip
+
+This method is especially appealing when $N$ is small or we actually want to estimate the fixed effect of each unit (IQ, ability, productivity, etc.)\medskip
+
+For this, we include $N$ dummies ($D_i$ is one for unit $i$) in the regression and estimate using OLS:
+\[y_{it} = \beta x_{it} + \sum_i a_i D_i + u_{it}\]
+This is also called the dummy variables estimator.\medskip
+
+The cost is that it is computing power intensive if $N$ is large.
+
+\end{frame}
+
+\begin{frame}{Within estimator}
+\[y_{it} = \beta x_{it}+(a_i+u_{it})\]\vspace*{-10pt}
+\begin{enumerate}
+\item Average equation overtime $t = 1,\dots,T$ $ (\bar{x}_i=\frac{1}{T}\sum_t x_{it}$ and so on):
+\[\bar{y}_{i} = \beta \bar{x}_{i}+(a_i+\bar{u}_{i})\]
+\item Subtract averaged equation from the main equation to get:
+\[(y_{it}-\bar{y}_{i}) =  \beta (x_{it}-\bar{x}_{i})+(u_{it}-\bar{u}_{i})\]	
+\item Define $\tilde{y}_{it}=y_{it}-\bar{y}_i$ and $\tilde{x}_{it}=x_{it}-\bar{x}$ and run a regression of $\tilde{y}_{it}$ on $\tilde{x}_{it}$ using OLS: $\tilde{y}_{it}=\beta\tilde{x}_{it}+\tilde{u}_{it}$
+\end{enumerate}\medskip
+Within estimator is exactly the same estimator as the dummy variable estimator. But without many dummy variables to estimate.
+This is very practical when $N$ is large and statistical packages use within estimator by default: 
+\texttt{xtreg y x , fe}
+
+\end{frame}
+
+
+\begin{frame}{First Differencing Estimator}
+\[y_{it} =  \beta x_{it}+(a_i+u_{it})\]
+\[y_{it-1} =  \beta x_{it-1}+(a_i+u_{it-1})\]
+\[y_{it}-y_{it-1} = \beta (x_{it}-x_{it-1})+u_{it}-u_{it-1} \]\[ \Rightarrow \ \Delta y_{it}=\beta \Delta x_{it}+\Delta u_{it} \]
+Run a regression of $\Delta y_{it}$ on $\Delta x_{it}$ using OLS.\bigskip
+
+Thus, lagging the model by one period eliminates $a_i$.\bigskip
+
+
+In differencing we lose the first time period for each cross section and instead of $T$ have $T-1$ time periods for each $i$.
+\end{frame}
+
+\begin{frame}{Within estimator vs first differencing estimator}
+For $T = 2$ within and first differencing are exactly equivalent.\bigskip
+
+For $T> 2$ they are different
+\begin{itemize}
+\item Under homoskedasticity i.e. $u_i\sim iid(0,\sigma^2)$, the within estimator is more efficient. 
+\item If $u_{it}$ is a random walk ($u_{it}=u_{it-1}+v_{it}$), then $\Delta u_{it}$ is serially uncorrelated and so the FD estimator is more efficient.
+\end{itemize}\medskip
+
+If the two estimators are significantly different you should worry about the validity of the strict exogeneity assumption.
+\end{frame}
+
+\subsection{Practical issues}
+\begin{frame}{Choosing between RE and FE}
+The RE assumption that Corr($a_i,x_i)=0$ is very strong and 
+POLS and RE estimator are inconsistent if the real model is FE.\medskip
+
+RE model may still be desirable under some circumstances
+\begin{itemize}
+\item If $N >>T$, in FE you include N dummies and loose N degrees of freedom, but in random effect you loose 2 dof ($a,\sigma^2_a$)
+\item In FE, you only estimate within-subject variability ($\tilde{y}_i=\beta\tilde{x}_i+\tilde{u}_i$) and loose any between-subject variabilities ($\bar{y}_i=\beta\bar{x}_i+\bar{u}_i$). If within variability is low (subjects change little overtime), FE may not work well. RE combines within and between variability to estimate.
+\item Measurement error is more problematic in FE.
+\end{itemize}
+
+To test the hypothesis that $a_i$ is uncorrelated with $x_{it}$, you can use a \textbf{Hausman test}. If the null is rejected you cannot use RE.
+\end{frame}
+
+\begin{frame}{Practical tips}
+As Corr($a_i,x_i)=0$ is unlikely to hold in many cases we usually prefer FE models.\medskip
+
+In micro panel regression we normally include time dummies. 
+\[y_{it} = \alpha+a_i+ b_t + \beta x_{it}+u_{it} \]
+Assume we have a binary treatment $x=0,1$. In terms of potential outcome model the above fixed effect regression assumes
+\[ E[y^0_{it}|i,t]=a_i+b_t \ \text{  and  } \ E[y^1_{it}|i,t]=a_i+b_t+\beta  \]
+When you see an equation with this notation, it means that all individual and times dummies are included in the regression. In fact:
+\begin{itemize}
+\item $a_i=a_1D_{i=1}+\dots+a_{N-1}D_{i=N-1}$ is a vector of individual dummies
+\item $b_t=b_1D_{t=1}+\dots+b_{T-1}D_{t=T-1}$ is a vector of time dummies
+\end{itemize} 
+\end{frame}
+
+\begin{frame}{Analyzing the magnitude of effect in the regressions}
+In many cases, when we run a regression, the variables are in different scales and hard to compare.
+To capture the effect size the simplest way is using standard deviation for scaling. \medskip
+
+Consider the simple regression of $n$ explanatory variables:
+\[y_i=\beta_0+\beta_1x_{1i}+\dots+\beta_nx_{ni}+\varepsilon_i \ \Rightarrow \ \bar{y}=\beta_1\bar{x}_1+\dots+\beta_n\bar{x}_n \]
+\[\frac{y_i-\bar{y}}{\sigma_y}=\beta_1\frac{\sigma_{x_1}}{\sigma_y}\frac{x_{1i}-\bar{x}_1}{\sigma_{x_1}}+\dots+\beta_n\frac{\sigma_{x_n}}{\sigma_y}\frac{x_{1n}-\bar{x}_n}{\sigma_{x_n}} +\frac{\varepsilon_i}{\sigma_y}\]
+Define $\tilde{y}_i=(y_i-\bar{y})/\sigma_y$ then \[\tilde{y}_i=\tilde{\beta}_1\tilde{x}_{1i}+\dots+\tilde{\beta}_n\tilde{x}_{ni}+\tilde{\varepsilon}_i \text{ where } \tilde{\beta}_i=\beta_i\frac{\sigma_{x_i}}{\sigma_y} \]
+$\tilde{\beta}_i$ is the normalized coefficient: if we increase $x_k$ by one SD ($\sigma_{x_k}$), then $y$ increases by $\tilde{\beta}_k$ SD of $y$ ($\sigma_{y}$).
+\end{frame}
+
+\begin{frame}{Effect magnitude in panel regressions}
+\[y_{st}=\beta_0+\sum_{i=1}^{S}{a_iS_i}+\sum_{i=1}^{T}{b_iT_i}+\beta_1x_{1st}+\ldots+\beta_nx_{nst}+\varepsilon_{st}\]
+\[\text{mean: } \bar{y}=\frac{1}{ST}\sum_{s,t=1}^{S,T}y_{st}, \text{ within  t: } \bar{y}_s=\frac{1}{T}\sum_{t=1}^{T}y_{st},\text{ within s: }\bar{y}_t= \frac{1}{S}\sum_{s=1}^{S}y_{st} \]
+\[\bar{y}=\beta_0+\sum_{i=1}^{S}{a_i{\bar{S}}_i}+\sum_{i=1}^{T}{b_i{\bar{T}}_i}+\beta_1{\bar{x}}_1+\ldots+\beta_n{\bar{x}}_n\]
+\[ {\bar{y}}_s=\beta_0+\sum_{i=1}^{S}{a_iS_i}+\sum_{i=1}^{T}{b_i{\bar{T}}_i}+\beta_1{\bar{x}}_{1s}+\ldots+\beta_n{\bar{x}}_{ns}+{\bar{\varepsilon}}_s \]
+\[{\bar{y}}_t=\beta_0+\sum_{i=1}^{S}{\alpha_i{\bar{S}}_i}+\sum_{i=1}^{T}{\beta_iT_i}+\beta_1{\bar{x}}_{1t}+\ldots+\beta_n{\bar{x}}_{nt}+{\bar{e}}_t\]
+\[y_{st}-\ {\bar{y}}_s-{\bar{y}}_t+\bar{y}=\beta_1\left(x_{1st}-{\bar{x}}_{1s}-{\bar{x}}_{1t}+{\bar{x}}_1\right)+\ldots+\beta_n\left(x_{nst}-{\bar{x}}_{ns}-{\bar{x}}_{nt}+{\bar{x}}_n\right)+e_{st}-{\bar{e}}_s-{\bar{e}}_t \]
+\end{frame}
+
+\begin{frame}{Effect magnitude in panel regressions}
+Define $\tilde{y}_{st}=y_{st}-\ {\bar{y}}_s-{\bar{y}}_t+\bar{y}$ and so on then
+\[ {\tilde{y}}_{st}=a_1{\tilde{x}}_{1st}+\ldots+a_n{\tilde{x}}_{nst}+{\tilde{e}}_{st} \]
+Therefore, if $\Delta x_k=\Delta \tilde{x}_k=\sigma_{\tilde{x}_k}$  then $\Delta y_k=\Delta \tilde{y}_k=\beta_k\sigma_{\tilde{x}_k}$ is how much variable $x_k$ can explain variation in $y$
+\[\frac{\Delta y_k}{\Delta y}=\beta_k\frac{\sigma_{\tilde{x}_k}}{\sigma_y}\]
+
+Note that $\sigma_{{\tilde{x}}_k}$ is de-meaned SD which is different from the simple SD ($\sigma_{x_k}$).
+\end{frame}
+
+\begin{frame}{The Effect of Unionization on Wages}
+Research question: Do union workers earn higher wages?\bigskip
+
+Selection problem: unionized workers may be different from non-unionized workers (e.g. higher skilled, more experienced).\bigskip
+
+Many of these factors are not observable creating omitted variable bias.\bigskip
+
+We can control for this unobserved factors using FE estimator.\medskip
+
+Freeman (1984) analyzed unionization comparing OLS and FE models. The results suggest a positive selection bias for the union workers.
+
+\end{frame}
+
+\begin{frame}{Freeman (1984)}
+\[\text{OLS: }\ Y_{it} = c + \lambda_t + \beta \text{Union}_{it} + \gamma X_{it}' + \eta_{it}\]
+\[\text{FE: }\ \ Y_{it} = a_i + \lambda_t + \beta \text{Union}_{it} + \gamma X_{it}' + v_{it}\]
+\begin{table}
+\centering
+\begin{tabular}{lccc}
+\hline\hline
+Survey&years& OLS& Fixed Effects\\
+\hline
+CPS &74-75 &0.19& 0.09\\
+NLSY& 70-78& 0.28& 0.19\\
+PSID& 70-79& 0.23 &0.14\\
+QES& 73-77 &0.14& 0.16\\
+\hline
+\end{tabular}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Measurment error in FE}
+OLS results were larger than FE can be due to selection bias.\bigskip
+
+Another plausible explanation is measurement error.\bigskip
+
+Measurement error introduces attenuation bias which biases the coefficient toward zero. 
+\begin{itemize}
+\item In FE we just use within-subject variation or deviations from the mean.
+\item This reduces the signal to noise ratio.
+\item Thus measurement error is a more important problem in fixed effect models compared to RE or POLS.
+\end{itemize}
+
+In Freeman (1984) union status may be misreported for some individuals in each year. Observed year to year changes in union status for one individual may thus be mostly noise.
+\end{frame}
+
+\end{document}

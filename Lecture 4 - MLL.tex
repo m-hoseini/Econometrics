@@ -1,0 +1,211 @@
+\documentclass{beamer}
+\usetheme{CambridgeUS} % replace it with Boadilla if you want no section bar
+%\usecolortheme{crane} % other ones: dove, dolphin, rose, seahorse, orchid, crane, seagull, lily, wolverine
+%\usefonttheme{serif} 
+\usefonttheme[onlymath]{serif} % uncomment if you want it just for math
+
+\setbeamertemplate{navigation symbols}{}  % comment to have nagivation
+
+\usepackage[compress,comma,authoryear]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{mindmap,trees}
+\usepackage{amsmath,mathtools}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx,epstopdf}
+\usepackage{hyperref}
+
+
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{red}{RGB}{213,94,0}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{green}{RGB}{0,158,115}
+\definecolor{Lblue}{RGB}{0,197,155}
+\definecolor{Dblue}{RGB}{0,76,119}
+\definecolor{Lgreen}{RGB}{180,255,230}
+
+\hypersetup{
+	colorlinks=false,
+	linkbordercolor = {white},
+	linkcolor = {blue}
+}
+\definecolor{MyBackground}{RGB}{245,245,245}
+
+\setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{title}{fg=blue}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{itemize item}[circle]%{$\bigstar$}
+\setbeamertemplate{itemize subitem}{$\bigstar$}
+\setbeamercolor{itemize item}{fg=blue}
+\setbeamercolor{itemize subitem}{fg=blue}
+\setbeamercolor{enumerate item}{fg=blue}
+\setbeamercolor{enumerate subitem}{fg=blue}
+\setbeamercolor{button}{bg=MyBackground,fg=blue}
+\setbeamercolor*{palette primary}{use=structure,fg=blue,bg=white}
+\setbeamercolor*{palette secondary}{use=structure,fg=white,bg=Dblue}
+\setbeamercolor*{palette tertiary}{use=structure,fg=white,bg=blue}
+\setbeamercolor*{palette quaternary}{fg=white,bg=black}
+\setbeamercolor*{palettes quaternary}{fg=white,bg=Lgreen}
+%\setbeamercolor{titlelike}{parent=structure,bg=Lgreen}
+%\setbeamercolor{title in head/foot}{bg=Lgreen,fg=orange}
+
+\setbeamertemplate{enumerate item}{%
+	\usebeamercolor[bg]{item projected}%\raisebox{1.5pt}
+	{\colorbox{white}{\color{blue}\footnotesize\textbf{\insertenumlabel.}}}%
+}
+
+
+
+
+
+
+\begin{document}
+	\title[Econometrics 2]{Econometrics 2 (M.Sc.)}
+	\subtitle{Maximum likelihood}
+	\author[Mohammad Hoseini]{Mohammad Hoseini}
+	
+	%\institute[IMPS]{Institute for Management and Planning Studies (IMPS)}
+	
+	\date[Spring 2024]{Spring 2024 \\
+	\vspace{10pt} @metrics2
+}
+
+	
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+\section{Maximum likelihood estimation}
+
+\begin{frame}{Limitations of OLS}
+In OLS, we assume that 
+\begin{enumerate}
+	\item the relationship is \textbf{linear}, 
+	\item error terms are \textbf{i.i.d}, %\textbf{normal} (or are uncorrelated with mean zero and equal variances.), 
+	\item the best predictor minimizes the sum of the \textbf{squared residuals}.\[\min_{\beta_0,\beta_1} \sum_{i}(y_i-\beta_0-\beta_1x_i)^2 \]
+\end{enumerate}
+
+
+There are other ways to define the best predictor. 
+For example, minimizing the sum of the \textbf{absolute value of the residuals} (median regression, \texttt{qreg} instead of \texttt{regress} in STATA).\[\min_{\beta_0,\beta_1} \sum_{i}|y_i-\beta_0-\beta_1x_i| \] 
+What if error-terms have specific distribution? or the relationship is non-linear?
+\end{frame}
+
+\begin{frame}{Maximum Likelihood (ML)}
+
+Another alternative that has many attractive properties involves maximizing the \textbf{likelihood function}.\bigskip
+
+This method enables us to estimate \textbf{a complex functional relationships}, including nonlinear specifications of the dependent variable and \textbf{any distribution} for error-terms. \[y_i=g(x_1,\dots,x_n)+\varepsilon_i \qquad\text{ or } \qquad y_i=g(x_1,\dots,x_n,\varepsilon_i)\]
+
+
+
+Assume that the error terms have an arbitrary distribution $f(\varepsilon|\theta)$, where $\theta$ includes the parameters of the distribution.\bigskip
+
+When error terms are i.i.d. their joint distribution becomes $f(\varepsilon_1,\varepsilon_2,\dots,\varepsilon_n|\theta)=f(\varepsilon_1|\theta)f(\varepsilon_2|\theta)\dots f(\varepsilon_n|\theta)$ 
+\end{frame}
+
+\begin{frame}{Maximum Likelihood (ML) Method}
+
+\begin{itemize}
+\item Joint distribution: $f(\varepsilon_1,\varepsilon_2,\dots,\varepsilon_n|\theta)=f(\varepsilon_1|\theta)f(\varepsilon_2|\theta)\dots f(\varepsilon_n|\theta)$
+\item We have $n$ random observations $\varepsilon_1,\dots,\varepsilon_n$ and want to estimate $\theta$. 
+\end{itemize}\medskip
+
+\text{Define likelihood function as the probability of observing the sample: } $$\displaystyle L(\theta)=\prod_{i=1}^n f(\varepsilon_i|\theta)$$
+
+By maximizing $L(\theta)$, we find the $\theta$ that make the happening of $\varepsilon_1,\dots,\varepsilon_n$ most probable.\medskip
+
+Cost: it results in a optimization problem to be solved by computers.\medskip
+
+We normally maximize the Log-likelihood function:
+\[ \max_\theta L(\theta)=\prod_{i=1}^N f(x_i|\theta) \quad 
+\Leftrightarrow
+\quad \max_\theta L\!L(\theta)=\sum_{i=1}^{N} \ln f(x_i|\theta) \]
+
+\end{frame}
+
+\begin{frame}{ML example: Normal distribution}
+
+\textbf{Normal distribution}: $f(x|\ \mu,\sigma)=\frac{1}{\sqrt{2\pi}\sigma}\exp[-\frac{(x_i-\mu)^2}{2\sigma^2}] $
+\begin{align*}
+LL(\mu,\sigma)&=\sum_{i=1}^N -\frac{1}{2}\ln 2\pi\sigma^2-\frac{(x-\mu)^2}{2\sigma^2}\\
+&=-\frac{n}{2}\ln 2\pi\sigma^2-\frac{1}{2\sigma^2}\sum_{i=1}^N(x_i-\mu)^2
+\end{align*}
+\[ \frac{\partial LL}{\partial \mu}=0 \ \Rightarrow \ \mu=\frac{1}{n}\sum_{i=1}^N x_i \]
+\[\frac{\partial LL}{\partial \sigma^2}=0 \ \Rightarrow \ \sigma^2= \frac{1}{n}\sum_{i=1}^N (x_i-\mu)^2 \]
+\end{frame}
+
+\begin{frame}{ML example: Poisson distribution}
+\textbf{Poisson distribution}: $\displaystyle f(x|\lambda)=\frac{\lambda^xe^{\lambda}}{x!} $
+\[ LL(\lambda)=\ln\lambda\sum_{i=1}^N x_i - n\lambda-\sum_{i=1}^N\ln x_i! \]
+\[\text{FOC: } \ \frac{1}{\lambda}\sum_{i=1}^Nx_i-n=0\ \Rightarrow \ \lambda=\bar{x}\]
+\end{frame}
+
+\begin{frame}{ML example: Uniform distribution}
+\textbf{Uniform distribution:}
+\[ f(x_1,\dots,x_n|\ a,b)=\begin{cases}
+(\frac{1}{b-a})^n\text{ if all }x_i \in [a,b] \\
+0\qquad \text{otherwise}
+\end{cases}  \]\bigskip \pause
+
+This is maximized by making $b - a$ as small as possible. \bigskip
+
+The only restriction is that the interval $[a, b]$ must include all the data. \bigskip
+
+Thus the MLE for the pair $(a, b)$ is
+\[a=\min(x_1,\dots,x_n),\quad b = \max(x_1,\dots, x_n)\]
+\end{frame}
+
+\begin{frame}{Linear regression with ML estimation}
+$y_i=\beta_0+\beta_1 x_i+\varepsilon_i$ assume the error terms are normally distributed with mean zero and variance $\sigma^2$:  $f(\varepsilon)=\frac{1}{\sqrt{2\pi}\sigma}\exp(-\frac{\varepsilon^2}{2\sigma^2})$. 
+The Log-likelihood function:
+\[ LL(\beta_0,\beta_1)=-\frac{n}{2}\ln 2\pi\sigma^2-\frac{1}{2\sigma^2}\sum_{i=1}^N(y_i-\beta_0-\beta_1x_i)^2  \]
+\[ \frac{\partial LL}{\partial \beta_0}=\sum_{i=1}^N (y_i-\beta_0-\beta_1 x_i)=0 \ \Rightarrow \ \beta_0=\bar{y}-\beta_1 \bar{x} \]
+\[ \frac{\partial LL}{\partial \beta_1}=\sum_{i=1}^N x_i(y_i-\beta_0-\beta_1 x_i)=0 \ \Rightarrow \ \beta_1=\frac{\sum_{i}(y_i-\bar{y})(x_i-\bar{x})}{\sum_{i}(x_i- \bar{x})^2 } \]
+\end{frame}
+
+\begin{frame}{Linear least absolute deviation regression}
+Assume that the error terms in linear regression have Laplace distribution. \[y_i=\beta_0+\beta_1x_i+\varepsilon_i,\qquad  f(\varepsilon_i)=\frac{1}{2\sigma}\exp(-\frac{|\varepsilon_i|}{\sigma}) \]
+The Log-likelihood function becomes:
+\[L\!L(\beta_0,\beta_1,\sigma)=-n\ln 2\sigma-\frac{1}{\sigma}\sum_{i=1}^n|y_i-\beta_0-\beta_1x_i| \]
+The ML estimation is minimizing the absolute error terms:
+\[\min_{\beta_0,\beta_1} \quad \sum_{i=1}^N |y_i-\beta_0-\beta_1x_i| \] 
+No explicit solution and it needs numerical optimization.
+\end{frame}
+
+\begin{frame}{ML numerical solution}
+It is typically not possible to solve MLE analytically and we rely on iterative techniques with a variety of algorithms. \bigskip
+
+The most common ones are based on first and sometimes second derivatives of the log likelihood function.
+\begin{itemize}
+\item Think of a blind man walking up a hill, and his knowledge comes from what passes under his feet. Provided the hill is strictly concave, the man should have no trouble finding the top.
+\item But if the hill is not strictly concave the man may find a wrong spot.
+\end{itemize}\bigskip
+
+You might specify only the LL function and let the machine find the derivatives numerically. 
+But if you can analytically specify the first and the second derivatives to the machine the solution is found much faster. 
+\end{frame}
+
+\begin{frame}{OLS vs. ML}
+In a linear regression with normally distributed error-terms, OLS and ML give the same result.\bigskip
+
+What if the error terms are not normally distributed or the relationship is not linear?\bigskip
+
+In these cases we build the likelihood function and solve the maximization problem numerically using an optimization algorithm (e.g. Newton-Raphson).\bigskip
+
+In STATA common regressions that use MLE have specific commands (e.g. \texttt{qreg, probit, logit})\bigskip
+
+The command \texttt{ML} is for general likelihood function.
+\end{frame}
+
+
+
+
+%\begin{frame}{References:}
+%\bibliographystyle{apalike}
+%\small
+%\bibliography{references}
+%\end{frame}
+
+\end{document}

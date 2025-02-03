@@ -1,0 +1,214 @@
+\documentclass[handout]{beamer}
+\usetheme{CambridgeUS} % replace it with Boadilla if you want no section bar
+%\usecolortheme{crane} % other ones: dove, dolphin, rose, seahorse, orchid, crane, seagull, lily, wolverine
+%\usefonttheme{serif} 
+\usefonttheme[onlymath]{serif} % uncomment if you want it just for math
+
+\setbeamertemplate{navigation symbols}{}  % comment to have nagivation
+
+\usepackage[compress,comma,authoryear]{natbib}
+\usepackage{tikz}
+\usetikzlibrary{mindmap,trees}
+\usepackage{amsmath,mathtools}
+\usepackage{amsthm}
+\usepackage{booktabs}
+\usepackage{graphicx,epstopdf}
+\usepackage{hyperref}
+
+
+\definecolor{blue}{RGB}{0,114,178}
+\definecolor{red}{RGB}{213,94,0}
+\definecolor{yellow}{RGB}{240,228,66}
+\definecolor{green}{RGB}{0,158,115}
+\definecolor{Lblue}{RGB}{0,197,155}
+\definecolor{Dblue}{RGB}{0,76,119}
+\definecolor{Lgreen}{RGB}{180,255,230}
+
+\hypersetup{
+	colorlinks=false,
+	linkbordercolor = {white},
+	linkcolor = {blue}
+}
+\definecolor{MyBackground}{RGB}{245,245,245}
+
+\setbeamercolor{frametitle}{fg=blue}
+\setbeamercolor{title}{fg=blue}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{} 
+\setbeamertemplate{itemize item}[circle]%{$\bigstar$}
+\setbeamertemplate{itemize subitem}{$\bigstar$}
+\setbeamercolor{itemize item}{fg=blue}
+\setbeamercolor{itemize subitem}{fg=blue}
+\setbeamercolor{enumerate item}{fg=blue}
+\setbeamercolor{enumerate subitem}{fg=blue}
+\setbeamercolor{button}{bg=MyBackground,fg=blue}
+\setbeamercolor*{palette primary}{use=structure,fg=blue,bg=white}
+\setbeamercolor*{palette secondary}{use=structure,fg=white,bg=Dblue}
+\setbeamercolor*{palette tertiary}{use=structure,fg=white,bg=blue}
+\setbeamercolor*{palette quaternary}{fg=white,bg=black}
+\setbeamercolor*{palettes quaternary}{fg=white,bg=Lgreen}
+%\setbeamercolor{titlelike}{parent=structure,bg=Lgreen}
+%\setbeamercolor{title in head/foot}{bg=Lgreen,fg=orange}
+
+\setbeamertemplate{enumerate item}{%
+	\usebeamercolor[bg]{item projected}%
+	\raisebox{1.5pt}{\colorbox{blue}{\color{fg}\footnotesize\insertenumlabel}}%
+}
+
+
+\begin{document}
+	\title[Econometrics 2]{Econometrics 2 (M.Sc.)}
+	\subtitle{Generalized Method of Moments}
+	\author[Mohammad Hoseini]{Mohammad Hoseini}
+	
+	%\institute[IMPS]{Institute for Management and Planning Studies (IMPS)}
+	
+	\date[Spring 2024]{Spring 2024 \\
+	\vspace{10pt} @metrics2
+}
+
+	
+\begin{frame}[plain]
+	\titlepage
+\end{frame}
+
+\section{Generalized method of moments}
+
+\begin{frame}{Method of moments in statistics}
+In statistics, method of moments is another way of estimating the parameters of a distribution.\bigskip
+
+Suppose a distribution with $k$ parameters $f(x;\theta_1,\dots,\theta_k)$. \medskip
+
+The moment $r$ of $f(.)$ is $m^r=\int_{-\infty}^{+\infty} x^rf(x;\theta_1,\dots,\theta_k)dx=g_r(\theta_1,\dots,\theta_k)$\bigskip
+
+Method of moments estimates the first $r$ moments using sample moments and then solves a system of equation to find $\theta_1,\dots,\theta_k$
+\[g_1(\hat{\theta}_1,\dots,\hat{\theta}_k)=\hat{m}^1=\frac{1}{n}\sum_i^n x_i \]
+\[\vdots \]
+\[g_k(\hat{\theta}_1,\dots,\hat{\theta}_k)=\hat{m}^k=\frac{1}{n}\sum_i^n x_i^k \]
+%what is resticting us from more moment? sample size! note that
+\end{frame}
+
+
+\begin{frame}{Example: Normal distribution}
+\textbf{Normal distribution}: $f(x|\ \mu,\sigma)=\frac{1}{\sqrt{2\pi}\sigma}\exp[-\frac{(x_i-\mu)^2}{2\sigma^2}] $
+
+Using integration by parts you can show that
+\begin{align*}
+m^1(\mu,\sigma)&=\int_{-\infty}^{+\infty} xf(x|\mu,\sigma)dx=\mu\\
+m^2(\mu,\sigma)&=\int_{-\infty}^{+\infty} x^2f(x|\mu,\sigma)dx=\mu^2+\sigma^2
+\end{align*}
+Therefore, the sample estimates give \[ m^1(\hat{\mu}, \hat{\sigma})=\hat{\mu}=\frac{1}{n}\sum_{i=1}^N x_i, \quad m^2(\hat{\mu}, \hat{\sigma})=\hat{\mu}^2+\hat{\sigma}^2=\frac{1}{n}\sum_{i=1}^N x_i^2 \] 
+
+Therefore
+\[\hat{\mu}=\frac{1}{n}\sum_{i=1}^N x_i, \qquad \hat{\sigma}^2= \frac{1}{n}\sum_{i=1}^N (x_i-\hat{\mu})^2 \]
+
+\end{frame}
+
+
+\begin{frame}{Moment (orthogonality) conditions in econometrics}
+In econometrics $E[\text{`something'}]=0$ is called a moment condition, where `something' is a function of some random variables (like $X,Y,Z$) and some parameters (like $\beta, \alpha$).\bigskip
+\pause
+
+Then, each moment condition is matched to its sample analogue:
+\[E[\text{`something'}]=0\quad \Rightarrow \quad  \frac{1}{N}\sum_{i=1}^n\text{`something'}=0 \]
+\pause
+
+To estimate the parameters, the number of moment conditions must be at least equal to the number of parameters.\medskip
+
+\end{frame}
+
+\begin{frame}{Deriving OLS using moment conditions}
+To estimate $y_i=\alpha+\beta x_i +\varepsilon_i$ in OLS, there are two parameters $\alpha$ and $\beta$ and two moment conditions:\pause
+\begin{enumerate}
+	\item $E[\varepsilon_i]=0,$
+	\item $E[x_i\varepsilon_i]=0$
+\end{enumerate}
+
+\[E[\varepsilon_i]=E[y_i-\alpha-\beta x_i ]=0 \ \Rightarrow \ \alpha=\bar{y}-\beta \bar{x} \]
+\[E[x_i\varepsilon_i]=E[x_i(y_i-\alpha-\beta x_i)]=0 \ \Rightarrow \ \beta=\frac{\sum_i(y_i-\bar{y})(x_i-\bar{x})}{\sum_i(x_i-\bar{x})^2}  \]
+
+%what happened to i.i.d assumption here? The point is that the (generalized) method of moment uses the law of large number for linking theoretical and empirical moments: the average of a random (iid) sample from a distribution with finite mean converges to the mean.
+
+Here we have a \textbf{just-identified} model because the number of moment conditions is equal to the number of parameters.
+\end{frame}
+
+
+\begin{frame}{Over-identified models}
+Denote $\Theta=[\theta_1,\dots,\theta_k]$ as the vector of parameters and $M=[m_1(\Theta),\dots,m_n(\Theta)]$ as a column vector of moment conditions.\bigskip
+
+When moment conditions are more than parameters ($k<n$), the model is \textbf{over-identified}.\bigskip
+
+
+What we can do when we have more equations than unknowns?\pause
+\begin{itemize}[<+->]
+	\item Drop some moment conditions to have equal parameter and equations
+	\item Why is it bad? 
+	\item Some information is lost. We should find an efficient estimator.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Generalized Method of Moments (GMM)}
+Motivation of GMM: 
+Instead of making all moment conditions equal to zero (which is impossible), or dropping some of them, take the weighted sum of square of the moment conditions and minimize it.\medskip
+
+$k<n$ and $M(\Theta)=0$ has no solution. We can find $\Theta$ by solving
+\[\min_\Theta \ \  w_{11}(m_1(\Theta))^2+\dots+w_{nn}(m_n(\Theta))^2 \]
+
+
+
+We can define any $n\times n$ weighting matrix $W$ to estimate $\Theta$.
+\[\min_\Theta \ \  Q(\Theta)= M^T.W.M \]
+What is the optimal weighting matrix? i.e. With what choice for $W$ can we make the best use of the data and information that we have?\medskip
+\end{frame}
+
+\begin{frame}{Generalized Method of Moments (GMM)}
+Hansen (1982) shows that the optimal weighting matrix is the inverse of the covariance matrix of $M(\Theta)$:
+\[ \Omega(\Theta)=E[M(\Theta).M^T(\Theta)],\quad W^*=\Omega^{-1}(\Theta) \]
+Intuition: Noisy moment conditions (with high variance) are less important in estimating $\Theta$ and should get lower weights.\bigskip
+
+Therefore, in GMM method we find $\Theta$ by solving the below problem
+\[ \min_\Theta \  Q(\Theta)=M^T(\Theta).\Omega^{-1}(\Theta).M(\Theta)  \]
+\end{frame}
+
+
+
+\begin{frame}{GMM estimation}
+
+Estimation of the weight matrix is typically the most tricky part of GMM.
+\begin{itemize}
+\item Two-step GMM: first assume $\Omega_1=I_n$ and estimate $\Theta_1$, then use $\Theta_1$ to estimate a new $\Omega_2$ and use $\Omega_2$ to re-estimate $\Theta_2$.
+\item Iterated GMM: repeat above estimation for $\Omega_3,\Theta_3,\dots$ until converging to a confidence interval.
+\item Continuously updated GMM: Directly compute $Q(\Theta)=M^T(\Theta).\Omega^{-1}(\Theta).M(\Theta)$ and minimize it.  
+
+\end{itemize}\bigskip
+
+Sometime the moment function cannot be evaluated explicitly (like in structural models), then the the method of simulated moments (MSM) is used for estimation.
+
+\end{frame}
+
+
+\begin{frame}{Relationship between GMM and MLL}
+MLL can be viewed as a special case of GMM.\bigskip
+
+In MLL
+$ \hat{\theta}=\arg\max_\theta E[\ln f(x_i|\theta)]$\medskip
+
+As long as everything is well behaved this means that
+$\displaystyle E\Big[\frac{\partial \ln f(x_i|\theta)}{\partial \theta} \Big]=0$
+ and we can use this as a moment condition.\medskip
+
+The important caveat is that this is only true if the log likelihood function is strictly concave and it has interior solution.\bigskip
+
+Unlike MLL, GMM does not require complete knowledge of the distribution of the data.\medskip
+
+If there are more moment conditions than model parameters, GMM estimation provides a straightforward way to estimate the proposed model. 
+\end{frame}
+
+
+%\begin{frame}{References:}
+%\bibliographystyle{apalike}
+%\small
+%\bibliography{references}
+%\end{frame}
+
+\end{document}
